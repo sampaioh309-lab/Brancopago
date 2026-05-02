@@ -6,6 +6,8 @@
 
 <style>
 body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
+
+/* ✅ TAMANHO ORIGINAL RESTAURADO */
 .container { max-width:900px; margin:auto; }
 
 .btn {
@@ -28,6 +30,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
 .relogio { font-size:20px; font-weight:bold; color:#38bdf8; margin-top:10px; }
 
+/* ✅ ORIGINAL */
 #historico {
     display:flex;
     justify-content:flex-start;
@@ -71,7 +74,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 .green { color:#22c55e; }
 .red { color:#ef4444; }
 
-/* 🔐 LOGIN (isolado, não mexe no robô) */
+/* 🔐 LOGIN (isolado, não interfere no layout) */
 #loginTela{
     position:fixed;
     top:0; left:0;
@@ -98,7 +101,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
     </div>
 </div>
 
-<!-- 🤖 ROBÔ ORIGINAL (NÃO ALTERADO) -->
+<!-- 🤖 ROBÔ ORIGINAL -->
 <div id="app" style="display:none">
 
 <div class="container">
@@ -154,7 +157,7 @@ function logar(){
     }
 }
 
-// 🔁 RESTO DO SEU ROBÔ (INALTERADO)
+// 🔁 SEU ROBÔ (INALTERADO)
 let historico = [];
 let sinais = [];
 let bufferSinais = [];
@@ -162,7 +165,6 @@ let bufferSinais = [];
 let wins = 0;
 let loss = 0;
 
-// RELÓGIO
 function atualizarRelogio() {
     const horaBR = new Date().toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo"});
     document.getElementById("relogio").innerText = horaBR;
@@ -170,19 +172,16 @@ function atualizarRelogio() {
 setInterval(atualizarRelogio,1000);
 atualizarRelogio();
 
-// REGRA
 function podeGerarSinal() {
     let d = new Date(), m = d.getMinutes(), s = d.getSeconds();
     return (m % 10 === 9 && s >= 30) || (m % 10 === 0 && s <= 5);
 }
 
-// IDENTIFICAR PEDRA 2
 function ehPedra2(data){
     const s = data.getSeconds();
     return (s >= 45 || s <= 14);
 }
 
-// ABRIR NÚMEROS
 function abrirNumeros(cor) {
     let html = "<h3>Escolha o número</h3>";
     let inicio = cor === 1 ? 1 : 8;
@@ -196,7 +195,6 @@ function abrirNumeros(cor) {
     document.getElementById("modal").style.display = "flex";
 }
 
-// ADD ORIGINAL (NÃO ALTERADO)
 function add(cor, numero) {
 
     document.getElementById("modal").style.display = "none";
@@ -236,7 +234,6 @@ function add(cor, numero) {
     render();
 }
 
-// RENDER
 function render(){
     const lista=historico.slice(-20);
 
@@ -253,4 +250,4 @@ function render(){
 </script>
 
 </body>
-        </html>
+    </html>
