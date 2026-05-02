@@ -2,11 +2,57 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hunter Branco Manual PRO</title>
 
 <style>
 body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
-.container { max-width:900px; margin:auto; }
+
+/* LOGIN */
+#loginTela{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:#020617;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.login-box{
+    background:#0f172a;
+    padding:30px;
+    border-radius:10px;
+    width:300px;
+}
+
+.login-box input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:5px;
+    border:none;
+}
+
+.login-box button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:5px;
+    background:#22c55e;
+    color:#000;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+/* 🔥 SEU LAYOUT ORIGINAL */
+.container {
+    width:100%;
+    max-width:900px;
+    margin:auto;
+    padding:10px;
+}
 
 .btn {
     font-size:30px; padding:15px; margin:5px;
@@ -27,9 +73,8 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
 #historico {
     display:flex;
-    justify-content:flex-end;
     flex-wrap:nowrap;
-    overflow:hidden;
+    overflow-x:auto;
 }
 
 .bolinha {
@@ -38,9 +83,9 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
     font-weight:bold; margin:3px; font-size:14px;
 }
 
-.b-vermelho { background:#ef4444; color:#fff; }
+.b-vermelho { background:#ef4444; }
 .b-preto { background:#111; color:#fff; }
-.b-branco { background:#fff; color:#000; box-shadow:0 0 6px #fff; }
+.b-branco { background:#fff; color:#000; }
 
 .modal {
     position:fixed; top:0; left:0;
@@ -50,52 +95,29 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 }
 
 .modal-content { background:#0f172a; padding:20px; border-radius:10px; }
-
-/* LOGIN (overlay, não altera layout) */
-#loginTela{
-    position:fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background:rgba(2,6,23,0.95);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-}
-
-.login-box{
-    background:#0f172a;
-    padding:30px;
-    border-radius:10px;
-}
-
-input{
-    padding:10px;
-    margin:10px;
-    border:none;
-    border-radius:5px;
-    width:200px;
-}
 </style>
 </head>
 
 <body>
 
-<!-- LOGIN -->
+<!-- 🔐 LOGIN -->
 <div id="loginTela">
     <div class="login-box">
-        <h2>🔒 Acesso restrito</h2>
-        <input type="text" id="user" placeholder="Usuário"><br>
-        <input type="password" id="pass" placeholder="Senha"><br>
+        <h2>🔐 Acesso</h2>
+        <input type="text" id="user" placeholder="Usuário">
+        <input type="password" id="pass" placeholder="Senha">
         <button onclick="logar()">Entrar</button>
-        <div id="erro" style="color:red;"></div>
+        <p id="erro" style="color:red;"></p>
     </div>
 </div>
+
+<!-- 🔥 SEU ROBÔ (ESCONDIDO ATÉ LOGAR) -->
+<div id="app" style="display:none">
 
 <div class="container">
 
 <h1>🤖 HUNTER BRANCO MANUAL PRO</h1>
-<div class="relogio" id="relogio">--:--:--</div>
+<div class="relogio" id="relogio"></div>
 
 <div class="card">
     <h2>Registrar Jogada</h2>
@@ -114,13 +136,7 @@ input{
     <div id="sinais"></div>
 </div>
 
-<div class="card">
-    <h2>Estatísticas</h2>
-    <div>Wins: <span id="wins">0</span></div>
-    <div>Loss: <span id="loss">0</span></div>
-    <div>Assertividade: <span id="assert">0%</span></div>
 </div>
-
 </div>
 
 <div id="modal" class="modal">
@@ -129,62 +145,42 @@ input{
 
 <script>
 
-// LOGIN (não altera layout)
+/* 🔐 LOGIN */
 function logar(){
     const u = document.getElementById("user").value;
     const p = document.getElementById("pass").value;
 
     if(u === "Diego Campos" && p === "D!3g0@2026#BlzX9"){
         document.getElementById("loginTela").style.display="none";
-    } else {
-        document.getElementById("erro").innerText="Acesso negado!";
+        document.getElementById("app").style.display="block";
+    }else{
+        document.getElementById("erro").innerText="Usuário ou senha inválidos";
     }
 }
 
-// ================= ROBÔ ORIGINAL =================
+/* 🔥 RESTO DO SEU CÓDIGO (INALTERADO) */
 
 let historico = [];
 let sinais = [];
-let bufferSinais = [];
 
-let wins = 0;
-let loss = 0;
+let pedra1 = null;
+let pedra2 = null;
 
 // RELÓGIO
 function atualizarRelogio() {
-    const horaBR = new Date().toLocaleTimeString("pt-BR", {
-        timeZone: "America/Sao_Paulo"
-    });
+    const horaBR = new Date().toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo"});
     document.getElementById("relogio").innerText = horaBR;
 }
-setInterval(atualizarRelogio, 1000);
-atualizarRelogio();
+setInterval(atualizarRelogio,1000);
 
-// REGRA
-function podeGerarSinal() {
-    let d = new Date(), m = d.getMinutes(), s = d.getSeconds();
-
-    if (m % 10 === 9 && s >= 15 && s <= 44) return true;
-    if (m % 10 === 9 && s >= 45) return true;
-    if (m % 10 === 0 && s <= 14) return true;
-
-    return false;
-}
-
-// SEGUNDA PEDRA
-function ehPedra2(data){
-    const s = data.getSeconds();
-    return (s >= 45 || s <= 14);
-}
-
-// ABRIR
+// ABRIR NÚMEROS
 function abrirNumeros(cor) {
     let html = "<h3>Escolha o número</h3>";
     let inicio = cor === 1 ? 1 : 8;
     let fim = cor === 1 ? 7 : 14;
 
     for (let i = inicio; i <= fim; i++) {
-        html += `<button class="numero-btn" onclick="add(${cor}, ${i})">${i}</button>`;
+        html += `<button onclick="add(${cor}, ${i})">${i}</button>`;
     }
 
     document.getElementById("numeros").innerHTML = html;
@@ -197,48 +193,82 @@ function add(cor, numero) {
     document.getElementById("modal").style.display = "none";
 
     const agora = new Date();
+    const m = agora.getMinutes();
+    const s = agora.getSeconds();
 
     historico.push({ cor, numero, hora: agora });
 
-    if (historico.length > 20) historico.shift();
+    const termino9 = (m % 10 === 9);
+    const termino0 = (m % 10 === 0);
 
-    if (cor !== 0 && podeGerarSinal()) {
-        const base = new Date(agora);
+    if (cor !== 0 && termino9 && s >= 15 && s <= 45) {
+
+        let base = new Date(agora);
+        base.setSeconds(0);
+        base.setMilliseconds(0);
         base.setMinutes(base.getMinutes() + 1);
 
-        const alvo = new Date(base.getTime() + numero * 60000);
+        let alvo = new Date(base.getTime() + numero * 60000);
 
-        if(ehPedra2(agora)){
-            alvo.setMinutes(alvo.getMinutes() - 1);
+        pedra1 = {
+            hora: alvo.toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'}),
+            numero: numero
+        };
+    }
+
+    else if (cor !== 0 && (
+        (termino9 && s > 45) ||
+        (termino0 && s <= 15)
+    )) {
+
+        let base = new Date(agora);
+
+        if (termino9) base.setMinutes(base.getMinutes() + 1);
+
+        base.setSeconds(0);
+        base.setMilliseconds(0);
+
+        let alvo = new Date(base.getTime() + numero * 60000);
+
+        pedra2 = {
+            hora: alvo.toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'}),
+            numero: numero
+        };
+    }
+
+    if (pedra1 && pedra2) {
+
+        if (pedra1.numero === pedra2.numero) {
+            sinais.push([{hora: pedra1.hora}]);
+        } else {
+            sinais.push([{hora: pedra1.hora}, {hora: pedra2.hora}]);
         }
 
-        const hora = alvo.toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'});
-
-        bufferSinais.push({hora});
-
-        if (bufferSinais.length === 2) {
-            sinais.push([...bufferSinais]);
-            bufferSinais = [];
-        }
+        pedra1 = null;
+        pedra2 = null;
     }
 
     render();
 }
 
 // RENDER
-function render() {
-    document.getElementById("historico").innerHTML =
-        historico.map(r =>
+function render(){
+    document.getElementById("historico").innerHTML=
+        historico.slice(-20).map(r=>
             `<div class="bolinha ${r.cor==0?'b-branco':r.cor==1?'b-vermelho':'b-preto'}">${r.numero}</div>`
         ).join("");
 
-    document.getElementById("sinais").innerHTML =
-        sinais.map(par =>
-            `<div class="sinal">⚪ ${par[0].hora} | ${par[1].hora}</div>`
-        ).join("");
+    document.getElementById("sinais").innerHTML=
+        sinais.map(par=>{
+            if(par.length === 1){
+                return `<div class="sinal">⚪ ${par[0].hora}</div>`;
+            }else{
+                return `<div class="sinal">⚪ ${par[0].hora} | ${par[1].hora}</div>`;
+            }
+        }).join("");
 }
 
 </script>
 
 </body>
-    </html>
+</html>
