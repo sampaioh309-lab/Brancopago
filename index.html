@@ -6,7 +6,7 @@
 
 <style>
 body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
-.container { max-width:900px; margin:auto; }
+.container { max-width:900px; margin:auto; display:none; }
 
 .btn {
     font-size:30px; padding:15px; margin:5px;
@@ -22,9 +22,6 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 .card { background:#0f172a; margin:10px; padding:15px; border-radius:10px; }
 
 .sinal { background:#1e293b; margin:5px; padding:10px; border-radius:8px; }
-
-.win { color:#22c55e; }
-.loss { color:#ef4444; }
 
 .relogio { font-size:20px; font-weight:bold; color:#38bdf8; margin-top:10px; }
 
@@ -53,12 +50,48 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 }
 
 .modal-content { background:#0f172a; padding:20px; border-radius:10px; }
+
+/* LOGIN */
+#loginTela{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:#020617;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.login-box{
+    background:#0f172a;
+    padding:30px;
+    border-radius:10px;
+}
+
+input{
+    padding:10px;
+    margin:10px;
+    border:none;
+    border-radius:5px;
+    width:200px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- LOGIN -->
+<div id="loginTela">
+    <div class="login-box">
+        <h2>🔒 Acesso restrito</h2>
+        <input type="text" id="user" placeholder="Usuário"><br>
+        <input type="password" id="pass" placeholder="Senha"><br>
+        <button onclick="logar()">Entrar</button>
+        <div id="erro" style="color:red;"></div>
+    </div>
+</div>
+
+<div class="container" id="app">
 
 <h1>🤖 HUNTER BRANCO MANUAL PRO</h1>
 <div class="relogio" id="relogio">--:--:--</div>
@@ -80,13 +113,6 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
     <div id="sinais"></div>
 </div>
 
-<div class="card">
-    <h2>Estatísticas</h2>
-    <div>Wins: <span id="wins">0</span></div>
-    <div>Loss: <span id="loss">0</span></div>
-    <div>Assertividade: <span id="assert">0%</span></div>
-</div>
-
 </div>
 
 <div id="modal" class="modal">
@@ -94,14 +120,25 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 </div>
 
 <script>
+
+// LOGIN
+function logar(){
+    const u = document.getElementById("user").value;
+    const p = document.getElementById("pass").value;
+
+    if(u === "Diego Campos" && p === "D!3g0@2026#BlzX9"){
+        document.getElementById("loginTela").style.display="none";
+        document.getElementById("app").style.display="block";
+    } else {
+        document.getElementById("erro").innerText="Acesso negado!";
+    }
+}
+
 let historico = [];
 let sinais = [];
 let bufferSinais = [];
 
-let wins = 0;
-let loss = 0;
-
-// RELÓGIO
+// RELÓGIO (original)
 function atualizarRelogio() {
     const horaBR = new Date().toLocaleTimeString("pt-BR", {
         timeZone: "America/Sao_Paulo"
@@ -111,7 +148,7 @@ function atualizarRelogio() {
 setInterval(atualizarRelogio, 1000);
 atualizarRelogio();
 
-// REGRA
+// REGRA (original)
 function podeGerarSinal() {
     let d = new Date(), m = d.getMinutes(), s = d.getSeconds();
 
@@ -122,13 +159,13 @@ function podeGerarSinal() {
     return false;
 }
 
-// 🔥 NOVO: DETECTA SEGUNDA PEDRA
+// 🔥 SEGUNDA PEDRA
 function ehPedra2(data){
     const s = data.getSeconds();
     return (s >= 45 || s <= 14);
 }
 
-// ABRIR
+// ABRIR (original)
 function abrirNumeros(cor) {
     let html = "<h3>Escolha o número</h3>";
     let inicio = cor === 1 ? 1 : 8;
@@ -142,7 +179,7 @@ function abrirNumeros(cor) {
     document.getElementById("modal").style.display = "flex";
 }
 
-// ADD
+// ADD (só 2 mudanças internas)
 function add(cor, numero) {
 
     document.getElementById("modal").style.display = "none";
@@ -151,7 +188,7 @@ function add(cor, numero) {
 
     historico.push({ cor, numero, hora: agora });
 
-    // 🔥 FIFO (roleta infinita)
+    // 🔥 FIFO
     if (historico.length > 20) historico.shift();
 
     if (cor !== 0 && podeGerarSinal()) {
@@ -160,7 +197,7 @@ function add(cor, numero) {
 
         const alvo = new Date(base.getTime() + numero * 60000);
 
-        // 🔥 SEGUNDA PEDRA = -1 MINUTO
+        // 🔥 -1 minuto na segunda pedra
         if(ehPedra2(agora)){
             alvo.setMinutes(alvo.getMinutes() - 1);
         }
@@ -178,7 +215,7 @@ function add(cor, numero) {
     render();
 }
 
-// RENDER
+// RENDER (só removeu slice)
 function render() {
     document.getElementById("historico").innerHTML =
         historico.map(r =>
@@ -190,6 +227,7 @@ function render() {
             `<div class="sinal">⚪ ${par[0].hora} | ${par[1].hora}</div>`
         ).join("");
 }
+
 </script>
 
 </body>
