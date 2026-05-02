@@ -7,52 +7,7 @@
 
 <style>
 body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
-
-/* LOGIN */
-#loginTela{
-    position:fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background:#020617;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-}
-
-.login-box{
-    background:#0f172a;
-    padding:30px;
-    border-radius:10px;
-    width:300px;
-}
-
-.login-box input{
-    width:100%;
-    padding:10px;
-    margin:10px 0;
-    border-radius:5px;
-    border:none;
-}
-
-.login-box button{
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:5px;
-    background:#22c55e;
-    color:#000;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-/* 🔥 SEU LAYOUT ORIGINAL */
-.container {
-    width:100%;
-    max-width:900px;
-    margin:auto;
-    padding:10px;
-}
+.container { width:100%; max-width:900px; margin:auto; padding:10px; }
 
 .btn {
     font-size:30px; padding:15px; margin:5px;
@@ -73,6 +28,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
 #historico {
     display:flex;
+    justify-content:flex-start;
     flex-wrap:nowrap;
     overflow-x:auto;
 }
@@ -83,9 +39,9 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
     font-weight:bold; margin:3px; font-size:14px;
 }
 
-.b-vermelho { background:#ef4444; }
+.b-vermelho { background:#ef4444; color:#fff; }
 .b-preto { background:#111; color:#fff; }
-.b-branco { background:#fff; color:#000; }
+.b-branco { background:#fff; color:#000; box-shadow:0 0 6px #fff; }
 
 .modal {
     position:fixed; top:0; left:0;
@@ -95,6 +51,43 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 }
 
 .modal-content { background:#0f172a; padding:20px; border-radius:10px; }
+
+/* 🔐 LOGIN (não interfere no layout do robô) */
+#loginTela{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:#020617;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.login-box{
+    background:#0f172a;
+    padding:25px;
+    border-radius:10px;
+    width:280px;
+}
+
+.login-box input{
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border:none;
+    border-radius:6px;
+}
+
+.login-box button{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    background:#22c55e;
+    font-weight:bold;
+    cursor:pointer;
+}
 </style>
 </head>
 
@@ -103,7 +96,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 <!-- 🔐 LOGIN -->
 <div id="loginTela">
     <div class="login-box">
-        <h2>🔐 Acesso</h2>
+        <h3>🔐 Acesso</h3>
         <input type="text" id="user" placeholder="Usuário">
         <input type="password" id="pass" placeholder="Senha">
         <button onclick="logar()">Entrar</button>
@@ -111,13 +104,13 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
     </div>
 </div>
 
-<!-- 🔥 SEU ROBÔ (ESCONDIDO ATÉ LOGAR) -->
+<!-- 🤖 ROBÔ (INALTERADO) -->
 <div id="app" style="display:none">
 
 <div class="container">
 
 <h1>🤖 HUNTER BRANCO MANUAL PRO</h1>
-<div class="relogio" id="relogio"></div>
+<div class="relogio" id="relogio">--:--:--</div>
 
 <div class="card">
     <h2>Registrar Jogada</h2>
@@ -145,7 +138,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
 <script>
 
-/* 🔐 LOGIN */
+// LOGIN
 function logar(){
     const u = document.getElementById("user").value;
     const p = document.getElementById("pass").value;
@@ -158,8 +151,7 @@ function logar(){
     }
 }
 
-/* 🔥 RESTO DO SEU CÓDIGO (INALTERADO) */
-
+// ROBÔ
 let historico = [];
 let sinais = [];
 
@@ -173,14 +165,14 @@ function atualizarRelogio() {
 }
 setInterval(atualizarRelogio,1000);
 
-// ABRIR NÚMEROS
+// ABRIR NÚMEROS (SEU PADRÃO ORIGINAL)
 function abrirNumeros(cor) {
     let html = "<h3>Escolha o número</h3>";
     let inicio = cor === 1 ? 1 : 8;
     let fim = cor === 1 ? 7 : 14;
 
     for (let i = inicio; i <= fim; i++) {
-        html += `<button onclick="add(${cor}, ${i})">${i}</button>`;
+        html += `<button class="numero-btn" onclick="add(${cor}, ${i})">${i}</button>`;
     }
 
     document.getElementById("numeros").innerHTML = html;
@@ -196,11 +188,12 @@ function add(cor, numero) {
     const m = agora.getMinutes();
     const s = agora.getSeconds();
 
-    historico.push({ cor, numero, hora: agora });
+    historico.push({ cor, numero });
 
     const termino9 = (m % 10 === 9);
     const termino0 = (m % 10 === 0);
 
+    // PEDRA 1
     if (cor !== 0 && termino9 && s >= 15 && s <= 45) {
 
         let base = new Date(agora);
@@ -210,16 +203,11 @@ function add(cor, numero) {
 
         let alvo = new Date(base.getTime() + numero * 60000);
 
-        pedra1 = {
-            hora: alvo.toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'}),
-            numero: numero
-        };
+        pedra1 = { hora: alvo.toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'}), numero };
     }
 
-    else if (cor !== 0 && (
-        (termino9 && s > 45) ||
-        (termino0 && s <= 15)
-    )) {
+    // PEDRA 2
+    else if (cor !== 0 && ((termino9 && s > 45) || (termino0 && s <= 15))) {
 
         let base = new Date(agora);
 
@@ -230,12 +218,10 @@ function add(cor, numero) {
 
         let alvo = new Date(base.getTime() + numero * 60000);
 
-        pedra2 = {
-            hora: alvo.toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'}),
-            numero: numero
-        };
+        pedra2 = { hora: alvo.toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'}), numero };
     }
 
+    // GERAR SINAL
     if (pedra1 && pedra2) {
 
         if (pedra1.numero === pedra2.numero) {
