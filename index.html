@@ -6,7 +6,7 @@
 
 <style>
 body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
-.container { max-width:900px; margin:auto; display:none; }
+.container { max-width:900px; margin:auto; }
 
 .btn {
     font-size:30px; padding:15px; margin:5px;
@@ -51,15 +51,16 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
 .modal-content { background:#0f172a; padding:20px; border-radius:10px; }
 
-/* LOGIN */
+/* LOGIN (overlay, não altera layout) */
 #loginTela{
     position:fixed;
     top:0; left:0;
     width:100%; height:100%;
-    background:#020617;
+    background:rgba(2,6,23,0.95);
     display:flex;
     justify-content:center;
     align-items:center;
+    z-index:9999;
 }
 
 .login-box{
@@ -91,7 +92,7 @@ input{
     </div>
 </div>
 
-<div class="container" id="app">
+<div class="container">
 
 <h1>🤖 HUNTER BRANCO MANUAL PRO</h1>
 <div class="relogio" id="relogio">--:--:--</div>
@@ -113,6 +114,13 @@ input{
     <div id="sinais"></div>
 </div>
 
+<div class="card">
+    <h2>Estatísticas</h2>
+    <div>Wins: <span id="wins">0</span></div>
+    <div>Loss: <span id="loss">0</span></div>
+    <div>Assertividade: <span id="assert">0%</span></div>
+</div>
+
 </div>
 
 <div id="modal" class="modal">
@@ -121,24 +129,28 @@ input{
 
 <script>
 
-// LOGIN
+// LOGIN (não altera layout)
 function logar(){
     const u = document.getElementById("user").value;
     const p = document.getElementById("pass").value;
 
     if(u === "Diego Campos" && p === "D!3g0@2026#BlzX9"){
         document.getElementById("loginTela").style.display="none";
-        document.getElementById("app").style.display="block";
     } else {
         document.getElementById("erro").innerText="Acesso negado!";
     }
 }
 
+// ================= ROBÔ ORIGINAL =================
+
 let historico = [];
 let sinais = [];
 let bufferSinais = [];
 
-// RELÓGIO (original)
+let wins = 0;
+let loss = 0;
+
+// RELÓGIO
 function atualizarRelogio() {
     const horaBR = new Date().toLocaleTimeString("pt-BR", {
         timeZone: "America/Sao_Paulo"
@@ -148,7 +160,7 @@ function atualizarRelogio() {
 setInterval(atualizarRelogio, 1000);
 atualizarRelogio();
 
-// REGRA (original)
+// REGRA
 function podeGerarSinal() {
     let d = new Date(), m = d.getMinutes(), s = d.getSeconds();
 
@@ -159,13 +171,13 @@ function podeGerarSinal() {
     return false;
 }
 
-// 🔥 SEGUNDA PEDRA
+// SEGUNDA PEDRA
 function ehPedra2(data){
     const s = data.getSeconds();
     return (s >= 45 || s <= 14);
 }
 
-// ABRIR (original)
+// ABRIR
 function abrirNumeros(cor) {
     let html = "<h3>Escolha o número</h3>";
     let inicio = cor === 1 ? 1 : 8;
@@ -179,7 +191,7 @@ function abrirNumeros(cor) {
     document.getElementById("modal").style.display = "flex";
 }
 
-// ADD (só 2 mudanças internas)
+// ADD
 function add(cor, numero) {
 
     document.getElementById("modal").style.display = "none";
@@ -188,7 +200,6 @@ function add(cor, numero) {
 
     historico.push({ cor, numero, hora: agora });
 
-    // 🔥 FIFO
     if (historico.length > 20) historico.shift();
 
     if (cor !== 0 && podeGerarSinal()) {
@@ -197,7 +208,6 @@ function add(cor, numero) {
 
         const alvo = new Date(base.getTime() + numero * 60000);
 
-        // 🔥 -1 minuto na segunda pedra
         if(ehPedra2(agora)){
             alvo.setMinutes(alvo.getMinutes() - 1);
         }
@@ -215,7 +225,7 @@ function add(cor, numero) {
     render();
 }
 
-// RENDER (só removeu slice)
+// RENDER
 function render() {
     document.getElementById("historico").innerHTML =
         historico.map(r =>
@@ -231,4 +241,4 @@ function render() {
 </script>
 
 </body>
-</html>
+    </html>
