@@ -7,8 +7,8 @@
 <style>
 body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
-/* ✅ TAMANHO ORIGINAL RESTAURADO */
-.container { max-width:900px; margin:auto; }
+/* 🔥 ÚNICA ALTERAÇÃO */
+.container { width:100%; margin:0; }
 
 .btn {
     font-size:30px; padding:15px; margin:5px;
@@ -30,7 +30,6 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
 .relogio { font-size:20px; font-weight:bold; color:#38bdf8; margin-top:10px; }
 
-/* ✅ ORIGINAL */
 #historico {
     display:flex;
     justify-content:flex-start;
@@ -74,7 +73,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 .green { color:#22c55e; }
 .red { color:#ef4444; }
 
-/* 🔐 LOGIN (isolado, não interfere no layout) */
+/* 🔐 LOGIN */
 #loginTela{
     position:fixed;
     top:0; left:0;
@@ -101,7 +100,6 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
     </div>
 </div>
 
-<!-- 🤖 ROBÔ ORIGINAL -->
 <div id="app" style="display:none">
 
 <div class="container">
@@ -144,7 +142,7 @@ body { background:#020617; color:#fff; font-family:Arial; text-align:center; }
 
 <script>
 
-// 🔐 LOGIN
+// LOGIN
 function logar(){
     const u = document.getElementById("user").value;
     const p = document.getElementById("pass").value;
@@ -157,7 +155,7 @@ function logar(){
     }
 }
 
-// 🔁 SEU ROBÔ (INALTERADO)
+// ROBÔ ORIGINAL
 let historico = [];
 let sinais = [];
 let bufferSinais = [];
@@ -247,7 +245,8 @@ function render(){
             `<div class="sinal">⚪ ${par[0].hora} | ${par[1].hora}</div>`
         ).join("");
 }
+
 </script>
 
 </body>
-    </html>
+</html>
